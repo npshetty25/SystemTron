@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Connect 4 - Classic Game</title>
+    <link rel="stylesheet" href="connect4.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="connect4.js"></script>
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1 class="game-title">🔴 Connect 4 🟡</h1>
+            <div class="game-info">
+                <div class="current-player">
+                    <span class="player-label">Current Player:</span>
+                    <div class="player-indicator" id="player-indicator"></div>
+                </div>
+                <button class="reset-btn" id="reset-btn">🔄 New Game</button>
+            </div>
+        </header>
+        
+        <main class="game-main">
+            <div class="winner-announcement" id="winner"></div>
+            <div class="board-container">
+                <div id="board"></div>
+                <div class="board-shadow"></div>
+            </div>
+        </main>
+        
+        <footer class="game-footer">
+            <p>Drop your pieces to connect four in a row!</p>
+        </footer>
+    </div>
+</body>
+</html>
