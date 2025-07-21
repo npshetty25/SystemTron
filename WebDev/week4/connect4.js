@@ -101,6 +101,9 @@ function setPiece() {
 
     r -= 1; //update the row height for that column
     currColumns[c] = r; //update the array
+    
+    // Update player indicator
+    updatePlayerIndicator();
 
     checkWinner();
 }
