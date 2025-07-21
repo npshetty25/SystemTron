@@ -1,0 +1,95 @@
+Week 1: Database Design & Creation
+Project: Create a relational database for an online store
+
+CREATE TABLE Categories (
+    CategoryID INT PRIMARY KEY,
+    CategoryName VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE Products (
+    ProductID INT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Description TEXT,
+    Price DECIMAL(10, 2) NOT NULL,
+    StockQuantity INT NOT NULL,
+    CategoryID INT,
+    FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID)
+);
+
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Email VARCHAR(100) NOT NULL UNIQUE,
+    Phone VARCHAR(15),
+    Address TEXT
+);
+
+CREATE TABLE Orders (
+    OrderID INT PRIMARY KEY,
+    CustomerID INT,
+    OrderDate DATETIME NOT NULL,
+    TotalAmount DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+
+CREATE TABLE OrderItems (
+    OrderItemID INT PRIMARY KEY,
+    OrderID INT,
+    ProductID INT,
+    Quantity INT NOT NULL,
+    Price DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+INSERT INTO Categories (CategoryID, CategoryName) VALUES (1, 'Electronics');
+INSERT INTO Categories (CategoryID, CategoryName) VALUES (2, 'Books');
+INSERT INTO Categories (CategoryID, CategoryName) VALUES (3, 'Clothing');
+INSERT INTO Categories (CategoryID, CategoryName) VALUES (4, 'Home & Kitchen');
+INSERT INTO Categories (CategoryID, CategoryName) VALUES (5, 'Sports & Outdoors');
+
+
+INSERT INTO Products (ProductID, Name, Description, Price, StockQuantity, CategoryID) VALUES (1, 'Laptop', 'High performance laptop', 999.99, 10, 1);
+INSERT INTO Products (ProductID, Name, Description, Price, StockQuantity, CategoryID) VALUES (2, 'Smartphone', 'Latest model smartphone', 699.99, 20, 1);
+INSERT INTO Products (ProductID, Name, Description, Price, StockQuantity, CategoryID) VALUES (3, 'Novel', 'Fictional novel', 19.99, 50, 2);
+INSERT INTO Products (ProductID, Name, Description, Price, StockQuantity, CategoryID) VALUES (4, 'T-Shirt', '100% cotton t-shirt', 19.99, 50, 3);
+INSERT INTO Products (ProductID, Name, Description, Price, StockQuantity, CategoryID) VALUES (5, 'Coffee Maker', 'Automatic drip coffee maker', 49.99, 30, 4);
+INSERT INTO Products (ProductID, Name, Description, Price, StockQuantity, CategoryID) VALUES (6, 'Yoga Mat', 'Non-slip yoga mat', 29.99, 25, 5);
+INSERT INTO Products (ProductID, Name, Description, Price, StockQuantity, CategoryID) VALUES (7, 'Headphones', 'Noise-cancelling headphones', 89.99, 15, 1);
+INSERT INTO Products (ProductID, Name, Description, Price, StockQuantity, CategoryID) VALUES (8, 'Cookbook', 'Delicious recipes for home cooking', 24.99, 40, 2);
+
+INSERT INTO Customers (CustomerID, FirstName, LastName, Email, Phone, Address) VALUES (1, 'John', 'Doe', 'john.doe@example.com', '123-456-7890', '123 Elm St');
+INSERT INTO Customers (CustomerID, FirstName, LastName, Email, Phone, Address) VALUES (2, 'Jane', 'Smith', 'jane.smith@example.com', '098-765-4321', '456 Oak St');
+INSERT INTO Customers (CustomerID, FirstName, LastName, Email, Phone, Address) VALUES (3, 'Alice', 'Johnson', 'alice.johnson@example.com', '321-654-0987', '789 Pine St');
+INSERT INTO Customers (CustomerID, FirstName, LastName, Email, Phone, Address) VALUES (4, 'Bob', 'Williams', 'bob.williams@example.com', '456-789-0123', '321 Maple St');
+INSERT INTO Customers (CustomerID, FirstName, LastName, Email, Phone, Address) VALUES (5, 'Charlie', 'Brown', 'charlie.brown@example.com', '654-321-0987', '654 Cedar St');
+
+INSERT INTO Orders (OrderID, CustomerID, OrderDate, TotalAmount) VALUES (1, 1, '2023-10-01 10:00:00', 1019.98);
+INSERT INTO Orders (OrderID, CustomerID, OrderDate, TotalAmount) VALUES (2, 2, '2023-10-02 11:00:00', 19.99);
+INSERT INTO Orders (OrderID, CustomerID, OrderDate, TotalAmount) VALUES (3, 3, '2023-10-03 12:00:00', 39.98);
+INSERT INTO Orders (OrderID, CustomerID, OrderDate, TotalAmount) VALUES (4, 4, '2023-10-04 14:30:00', 1099.98);
+INSERT INTO Orders (OrderID, CustomerID, OrderDate, TotalAmount) VALUES (5, 5, '2023-10-05 09:15:00', 24.99);
+
+INSERT INTO OrderItems (OrderItemID, OrderID, ProductID, Quantity, Price) VALUES (1, 1, 1, 1, 999.99);
+INSERT INTO OrderItems (OrderItemID, OrderID, ProductID, Quantity, Price) VALUES (2, 1, 2, 1, 699.99);
+INSERT INTO OrderItems (OrderItemID, OrderID, ProductID, Quantity, Price) VALUES (3, 2, 3, 1, 19.99);
+INSERT INTO OrderItems (OrderItemID, OrderID, ProductID, Quantity, Price) VALUES (4, 3, 4, 2, 19.99);  -- T-Shirt
+INSERT INTO OrderItems (OrderItemID, OrderID, ProductID, Quantity, Price) VALUES (5, 4, 1, 1, 999.99);  -- Laptop
+INSERT INTO OrderItems (OrderItemID, OrderID, ProductID, Quantity, Price) VALUES (6, 4, 5, 1, 49.99);   -- Coffee Maker
+INSERT INTO OrderItems (OrderItemID, OrderID, ProductID, Quantity, Price) VALUES (7, 5, 8, 1, 24.99);   -- Cookbook
+
+
+ /* Retrieve all products: */
+ 	 SELECT * FROM Products;
+     
+/*Retrieve all orders with customer details:*/
+SELECT o.OrderID, c.FirstName, c.LastName, o.OrderDate, o.TotalAmount
+FROM Orders o
+JOIN Customers c ON o.CustomerID = c.CustomerID;
+/*Retrieve order items for a specific order:*/
+
+SELECT oi.OrderItemID, p.Name, oi.Quantity, oi.Price
+FROM OrderItems oi
+JOIN Products p ON oi.ProductID = p.ProductID
+WHERE oi.OrderID = 1;
+ 
