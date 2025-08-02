@@ -200,6 +200,16 @@ class MovieRatingPredictor:
         # Engineer features for the input
         try:
             features, _ = self.feature_engineer.engineer_features(input_df)
+            
+            # Ensure all training features are present
+            training_features = self.features.columns
+            for feature in training_features:
+                if feature not in features.columns:
+                    features[feature] = 0  # Default value for missing features
+            
+            # Reorder columns to match training data
+            features = features.reindex(columns=training_features, fill_value=0)
+            
             scaled_features = self.feature_engineer.scale_features(features, fit=False)
             
             # Make prediction using best model

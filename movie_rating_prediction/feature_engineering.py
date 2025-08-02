@@ -25,6 +25,8 @@ class FeatureEngineer:
         self.encoders = {}
         self.scaler = StandardScaler()
         self.feature_names = []
+        self.top_categories = {}  # Initialize top_categories dictionary
+        self.numerical_columns = []  # Store numerical columns for scaling
         self.is_fitted = False
         
     def engineer_features(self, data: pd.DataFrame, target_col: str = 'rating') -> Tuple[pd.DataFrame, pd.Series]:
@@ -92,11 +94,27 @@ class FeatureEngineer:
                     self.encoders[col] = LabelEncoder()
                     features_df[f'{col}_encoded'] = self.encoders[col].fit_transform(df[col].astype(str))
                 else:
-                    # Transform using existing encoder
-                    features_df[f'{col}_encoded'] = self.encoders[col].transform(df[col].astype(str))
+                    # Transform using existing encoder, handle unseen labels
+                    try:
+                        features_df[f'{col}_encoded'] = self.encoders[col].transform(df[col].astype(str))
+                    except ValueError:
+                        # Handle unseen labels by replacing with most common label
+                        df_temp = df[col].astype(str).copy()
+                        unseen_mask = ~df_temp.isin(self.encoders[col].classes_)
+                        if unseen_mask.any():
+                            most_common = self.encoders[col].classes_[0]  # First class (most common)
+                            df_temp[unseen_mask] = most_common
+                            print(f"Warning: Found unseen {col} values, replaced with '{most_common}'")
+                        features_df[f'{col}_encoded'] = self.encoders[col].transform(df_temp)
                 
                 # One-hot encoding for top categories (to avoid too many features)
-                top_categories = df[col].value_counts().head(10).index.tolist()
+                if col not in self.top_categories:
+                    # Store top categories during fitting
+                    top_categories = df[col].value_counts().head(10).index.tolist()
+                    self.top_categories[col] = top_categories
+                else:
+                    top_categories = self.top_categories[col]
+                
                 for category in top_categories:
                     features_df[f'{col}_{category}'] = (df[col] == category).astype(int)
                 
@@ -174,14 +192,21 @@ class FeatureEngineer:
         
         if numerical_cols:
             if fit:
+                # Store the numerical columns for later use
+                self.numerical_columns = numerical_cols
                 scaled_df[numerical_cols] = self.scaler.fit_transform(features_df[numerical_cols])
                 self.is_fitted = True
                 print("Fitted and transformed features")
             else:
                 if not self.is_fitted:
                     raise ValueError("Scaler not fitted. Please fit on training data first.")
-                scaled_df[numerical_cols] = self.scaler.transform(features_df[numerical_cols])
-                print("Transformed features using existing scaler")
+                # Use stored numerical columns, only scale those that exist in current data
+                cols_to_scale = [col for col in self.numerical_columns if col in features_df.columns]
+                if cols_to_scale:
+                    scaled_df[cols_to_scale] = self.scaler.transform(features_df[cols_to_scale])
+                    print(f"Transformed {len(cols_to_scale)} features using existing scaler")
+                else:
+                    print("No numerical features to scale")
         
         return scaled_df
     
